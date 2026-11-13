@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facebook Group Link Copier</title>
+  <style>
+    /* ==========================================================================
+       THEME VARIABLES (Light & Dark Mode with System Preference + Manual Override)
+       ========================================================================== */
+    :root {
+      color-scheme: light dark;
+      --bg-page: #f4f6f9;
+      --bg-card: #ffffff;
+      --bg-row-hover: #f0f4ff;
+      --bg-row-selected: #eef4ff;
+      --bg-input: #ffffff;
+      --bg-preview: #f8fafc;
+      --bg-badge: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --border-color: #dbe2ea;
+      --border-selected: #93c5fd;
+      --accent: #1877f2;
+      --accent-hover: #1464cf;
+      --accent-active: #0f52ad;
+      --accent-text: #ffffff;
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --success-text: #14532d;
+      --danger-hover: #fee2e2;
+      --danger-text: #dc2626;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.08);
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 8px;
+      --font-stack: 'Noto Sans Sinhala', 'Iskoola Pota', 'Malithi Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg-page: #0b0f19;
+        --bg-card: #151c2c;
+        --bg-row-hover: #1e293b;
+        --bg-row-selected: #172554;
+        --bg-input: #0f172a;
+        --bg-preview: #0f172a;
+        --bg-badge: #1e293b;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --border-color: #263147;
+        --border-selected: #2563eb;
+        --accent: #2563eb;
+        --accent-hover: #3b82f6;
+        --accent-active: #1d4ed8;
+        --accent-text: #ffffff;
+        --success: #22c55e;
+        --success-bg: #14532d;
+        --success-text: #dcfce7;
+        --danger-hover: #3f1d24;
+        --danger-text: #f87171;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.4);
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg-page: #0b0f19;
+      --bg-card: #151c2c;
+      --bg-row-hover: #1e293b;
+      --bg-row-selected: #172554;
+      --bg-input: #0f172a;
+      --bg-preview: #0f172a;
+      --bg-badge: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border-color: #263147;
+      --border-selected: #2563eb;
+      --accent: #2563eb;
+      --accent-hover: #3b82f6;
+      --accent-active: #1d4ed8;
+      --accent-text: #ffffff;
+      --success: #22c55e;
+      --success-bg: #14532d;
+      --success-text: #dcfce7;
+      --danger-hover: #3f1d24;
+      --danger-text: #f87171;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ==========================================================================
+       BASE & RESET
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-stack);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 16px;
+      padding-bottom: 40px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ==========================================================================
+       HEADER
+       ========================================================================== */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 4px 2px;
+    }
+
+    .title-wrap h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-wrap p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .theme-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .theme-btn:hover {
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    /* ==========================================================================
+       CONTROLS BAR (SEARCH, COUNTER, SELECT ALL / CLEAR ALL)
+       ========================================================================== */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .toolbar {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 11px 38px 11px 38px;
+      font-size: 0.95rem;
+      font-family: var(--font-stack);
+      color: var(--text-primary);
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.18);
+    }
+
+    .clear-search-btn {
+      position: absolute;
+      right: 8px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .clear-search-btn.visible {
+      display: inline-flex;
+    }
+
+    .clear-search-btn:hover {
+      background: var(--bg-badge);
+      color: var(--text-primary);
+    }
+
+    .action-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .counter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--bg-row-selected);
+      border: 1px solid var(--border-selected);
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+
+    .counter-badge.zero {
+      color: var(--text-muted);
+      background: var(--bg-badge);
+      border-color: transparent;
+    }
+
+    .bulk-buttons {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-secondary {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 7px 13px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--bg-row-hover);
+      border-color: var(--accent);
+    }
+
+    .btn-secondary.clear-btn:hover:not(:disabled) {
+      background: var(--danger-hover);
+      border-color: var(--danger-text);
+      color: var(--danger-text);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    /* ==========================================================================
+       GROUP LIST & TOUCH-FRIENDLY ROWS
+       ========================================================================== */
+    .group-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      divide-y: 1px solid var(--border-color);
+    }
+
+    .group-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      min-height: 58px;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.12s ease;
+    }
+
+    .group-row:last-child {
+      border-bottom: none;
+    }
+
+    .group-row:hover {
+      background-color: var(--bg-row-hover);
+    }
+
+    .group-row.selected {
+      background-color: var(--bg-row-selected);
+    }
+
+    .row-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Custom large touch-friendly checkbox */
+    .group-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--text-muted);
+      border-radius: 6px;
+      background-color: var(--bg-input);
+      display: grid;
+      place-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.14s ease;
+    }
+
+    .group-checkbox::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      transform: scale(0);
+      transition: transform 0.12s ease-in-out;
+      box-shadow: inset 1em 1em var(--accent-text);
+      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    }
+
+    .group-checkbox:checked {
+      background-color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .group-checkbox:checked::before {
+      transform: scale(1);
+    }
+
+    .group-checkbox:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .group-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .group-name {
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      word-break: break-word;
+      line-height: 1.4;
+    }
+
+    .group-url-sub {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 1px;
+    }
+
+    .group-link-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      text-decoration: none;
+      flex-shrink: 0;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .group-link-btn:hover {
+      background-color: var(--bg-badge);
+      color: var(--accent);
+    }
+
+    .empty-state {
+      padding: 36px 20px;
+      text-align: center;
+      color: var(--text-muted);
+      display: none;
+      font-size: 0.95rem;
+    }
+
+    .empty-state.visible {
+      display: block;
+    }
+
+    /* ==========================================================================
+       BIG COPY BUTTON & CONFIRMATION
+       ========================================================================== */
+    .copy-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .copy-btn-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn-copy-main {
+      width: 100%;
+      padding: 16px 24px;
+      font-size: 1.08rem;
+      font-weight: 700;
+      font-family: var(--font-stack);
+      color: var(--accent-text);
+      background-color: var(--accent);
+      border: none;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background-color 0.15s ease, transform 0.1s ease, opacity 0.15s ease;
+      user-select: none;
+    }
+
+    .btn-copy-main:hover:not(:disabled) {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-copy-main:active:not(:disabled) {
+      background-color: var(--accent-active);
+      transform: scale(0.99);
+    }
+
+    .btn-copy-main:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-copy-main.copied {
+      background-color: var(--success);
+    }
+
+    .copied-toast {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background-color: var(--success-bg);
+      color: var(--success-text);
+      border: 1px solid var(--success);
+      font-size: 0.875rem;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      align-self: center;
+    }
+
+    .copied-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==========================================================================
+       LIVE PREVIEW BOX
+       ========================================================================== */
+    .preview-card {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .preview-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .preview-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .preview-box {
+      width: 100%;
+      min-height: 150px;
+      max-height: 340px;
+      padding: 14px;
+      font-family: var(--font-stack);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: var(--text-primary);
+      background-color: var(--bg-preview);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-y: auto;
+    }
+
+    .preview-box.empty {
+      color: var(--text-muted);
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    /* ==========================================================================
+       RESPONSIVE TWEAKS
+       ========================================================================== */
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+        padding-bottom: 32px;
+      }
+
+      .group-row {
+        padding: 14px 12px;
+      }
+
+      .toolbar {
+        padding: 12px;
+      }
+
+      .title-wrap h1 {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="title-wrap">
+        <h1>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent)">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+          </svg>
+          FB Group Copier
+        </h1>
+        <p>Select groups and copy formatted links in one tap</p>
+      </div>
+      <button type="button" id="themeToggleBtn" class="theme-btn" aria-label="Toggle color theme">
+        <span id="themeIcon">🌓</span>
+        <span id="themeLabel">Auto</span>
+      </button>
+    </header>
+
+    <!-- Main Group List Card -->
+    <section class="card" aria-label="Facebook Groups">
+      <div class="toolbar">
+        <!-- Search Input (Supports Sinhala & English) -->
+        <div class="search-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="search"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search groups by name (සිංහල / English)..."
+            autocomplete="off"
+            aria-label="Search groups by name"
+          >
+          <button type="button" id="clearSearchBtn" class="clear-search-btn" title="Clear search" aria-label="Clear search">
+            ✕
+          </button>
+        </div>
+
+        <!-- Counter & Bulk Action Buttons -->
+        <div class="action-row">
+          <div id="counterBadge" class="counter-badge zero" aria-live="polite">
+            0 selected
+          </div>
+          <div class="bulk-buttons">
+            <button type="button" id="selectAllBtn" class="btn-secondary">Select all</button>
+            <button type="button" id="clearAllBtn" class="btn-secondary clear-btn" disabled>Clear all</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Group Rows List -->
+      <ul id="groupList" class="group-list" role="listbox" aria-multiselectable="true"></ul>
+      <div id="emptyState" class="empty-state">
+        No matching groups found.
+      </div>
+    </section>
+
+    <!-- Copy Button & Confirmation Banner -->
+    <section class="copy-section">
+      <div class="copy-btn-wrapper">
+        <button type="button" id="copyBtn" class="btn-copy-main" disabled>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span id="copyBtnText">Copy to clipboard</span>
+        </button>
+        <div id="copiedToast" class="copied-toast" role="status" aria-live="polite">
+          ✓ Copied! Ready to paste anywhere.
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Text Preview Box -->
+    <section class="card preview-card" aria-label="Clipboard Preview">
+      <div class="preview-header">
+        <span class="preview-title">Live Preview</span>
+        <span id="previewCountHint" class="preview-hint">Nothing selected</span>
+      </div>
+      <div id="previewBox" class="preview-box empty">Select one or more groups above to preview the text that will be copied.</div>
+    </section>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       GROUP DATA
+       Add, edit, or remove Facebook groups in the array below.
+       Each item must be an object with { name, url }.
+       The copied output will always follow the exact order of this list.
+       ========================================================================== */
+    const GROUPS = [
+      {
+        name: "වීදි සතුන්ට සරණක් සොයා",
+        url: "https://www.facebook.com/share/g/1G3YQJpamG/?mibextid=wwXIfr"
+      },
+      {
+        name: "අසරණයන් වෙනුවෙන් අපි",
+        url: "https://www.facebook.com/share/g/1BiF5ok5Tf/?mibextid=wwXIfr"
+      },
+      {
+        name: "පූස්.lk new group",
+        url: "https://www.facebook.com/share/g/18ucbutuFS/?mibextid=wwXIfr"
+      },
+      {
+        name: "ආදරණීය පූස් යාළුවො",
+        url: "https://www.facebook.com/share/g/15qE5QWFNx/?mibextid=wwXIfr"
+      },
+      {
+        name: "පූසන්ගේ ලෝකය",
+        url: "https://www.facebook.com/share/g/1FNo1YNgpP/?mibextid=wwXIfr"
+      },
+      {
+        name: "Silent Lovers",
+        url: "https://www.facebook.com/share/g/1FJ8VYso7K/?mibextid=wwXIfr"
+      },
+      {
+        name: "Life with Street Animals",
+        url: "https://www.facebook.com/share/g/16uRtdTNAr/?mibextid=wwXIfr"
+      },
+      {
+        name: "Helping Stray Cats",
+        url: "https://www.facebook.com/share/g/1PgsWNErcS/?mibextid=wwXIfr"
+      },
+      {
+        name: "සතුන් බේරාගැනීම (Animal Rescue)",
+        url: "https://www.facebook.com/share/g/1PFaW7tCoE/?mibextid=wwXIfr"
+      },
+      {
+        name: "බව්වන්ගේ ලෝකය",
+        url: "https://www.facebook.com/share/g/16a7KajNVk/?mibextid=wwXIfr"
+      },
+      {
+        name: "බව් බව්",
+        url: "https://www.facebook.com/share/g/19PCp8nuWD/?mibextid=wwXIfr"
+      },
+      {
+        name: "සුනඛ රජදහන",
+        url: "https://www.facebook.com/share/g/1GxcPqfEmz/?mibextid=wwXIfr"
+      },
+      {
+        name: "සුරතල් බල්ලන් ඇති කිරීමේ සංසදය (All Breed)",
+        url: "https://www.facebook.com/share/g/1PWozFEMgW/?mibextid=wwXIfr"
+      }
+    ];
+
+    /* ==========================================================================
+       APPLICATION STATE & STORAGE KEYS
+       ========================================================================== */
+    const STORAGE_KEY_SELECTION = "fb_group_copier_selected_urls_v1";
+    const STORAGE_KEY_THEME = "fb_group_copier_theme_v1";
+
+    // Set of selected group URLs
+    let selectedUrls = new Set();
+    let searchQuery = "";
+    let copyResetTimeout = null;
+
+    // DOM Elements
+    const groupListEl = document.getElementById("groupList");
+    const emptyStateEl = document.getElementById("emptyState");
+    const searchInputEl = document.getElementById("searchInput");
+    const clearSearchBtnEl = document.getElementById("clearSearchBtn");
+    const counterBadgeEl = document.getElementById("counterBadge");
+    const selectAllBtnEl = document.getElementById("selectAllBtn");
+    const clearAllBtnEl = document.getElementById("clearAllBtn");
+    const copyBtnEl = document.getElementById("copyBtn");
+    const copyBtnTextEl = document.getElementById("copyBtnText");
+    const copiedToastEl = document.getElementById("copiedToast");
+    const previewBoxEl = document.getElementById("previewBox");
+    const previewCountHintEl = document.getElementById("previewCountHint");
+    const themeToggleBtnEl = document.getElementById("themeToggleBtn");
+    const themeIconEl = document.getElementById("themeIcon");
+    const themeLabelEl = document.getElementById("themeLabel");
+
+    /* ==========================================================================
+       LOCAL STORAGE HELPERS (WRAPPED IN TRY/CATCH)
+       ========================================================================== */
+    function loadSavedSelection() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_SELECTION);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const validUrls = new Set(GROUPS.map(g => g.url));
+          parsed.forEach(url => {
+            if (validUrls.has(url)) {
+              selectedUrls.add(url);
+            }
+          });
+        }
+      } catch (err) {
+        // Ignore storage errors (e.g., private browsing or restricted iframe)
+      }
+    }
+
+    function saveSelection() {
+      try {
+        const orderedUrls = GROUPS
+          .filter(g => selectedUrls.has(g.url))
+          .map(g => g.url);
+        localStorage.setItem(STORAGE_KEY_SELECTION, JSON.stringify(orderedUrls));
+      } catch (err) {
+        // Ignore storage errors
+      }
+    }
+
+    /* ==========================================================================
+       THEME MANAGEMENT (AUTO / LIGHT / DARK)
+       ========================================================================== */
+    const THEME_MODES = ["auto", "light", "dark"];
+    let currentThemeMode = "auto";
+
+    function loadTheme() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_THEME);
+        if (saved && THEME_MODES.includes(saved)) {
+          currentThemeMode = saved;
+        }
+      } catch (err) {
+        // Ignore storage errors
+      }
+      applyTheme();
+    }
+
+    function applyTheme() {
+      const root = document.documentElement;
+      if (currentThemeMode === "auto") {
+        root.removeAttribute("data-theme");
+        themeIconEl.textContent = "🌓";
+        themeLabelEl.textContent = "Auto";
+      } else if (currentThemeMode === "light") {
+        root.setAttribute("data-theme", "light");
+        themeIconEl.textContent = "☀️";
+        themeLabelEl.textContent = "Light";
+      } else {
+        root.setAttribute("data-theme", "dark");
+        themeIconEl.textContent = "🌙";
+        themeLabelEl.textContent = "Dark";
+      }
+    }
+
+    themeToggleBtnEl.addEventListener("click", () => {
+      const nextIndex = (THEME_MODES.indexOf(currentThemeMode) + 1) % THEME_MODES.length;
+      currentThemeMode = THEME_MODES[nextIndex];
+      applyTheme();
+      try {
+        localStorage.setItem(STORAGE_KEY_THEME, currentThemeMode);
+      } catch (err) {
+        // Ignore
+      }
+    });
+
+    /* ==========================================================================
+       FORMAT SELECTED GROUPS FOR CLIPBOARD & PREVIEW
+       Keeps groups in the exact order of the GROUPS list, regardless of tick order.
+       ========================================================================== */
+    function getFormattedOutput() {
+      const orderedSelected = GROUPS.filter(group => selectedUrls.has(group.url));
+      return orderedSelected
+        .map(group => `${group.name}\n${group.url}`)
+        .join("\n\n");
+    }
+
+    /* ==========================================================================
+       RENDER LIST & UI STATE
+       ========================================================================== */
+    function renderGroupList() {
+      groupListEl.innerHTML = "";
+
+      const normalizedQuery = searchQuery.trim().toLocaleLowerCase();
+      let visibleCount = 0;
+
+      GROUPS.forEach((group, index) => {
+        const matchesSearch =
+          normalizedQuery === "" ||
+          group.name.toLocaleLowerCase().includes(normalizedQuery);
+
+        if (!matchesSearch) return;
+        visibleCount++;
+
+        const isSelected = selectedUrls.has(group.url);
+
+        const li = document.createElement("li");
+        li.className = "group-row" + (isSelected ? " selected" : "");
+        li.setAttribute("role", "option");
+        li.setAttribute("aria-selected", isSelected ? "true" : "false");
+
+        const leftDiv = document.createElement("div");
+        leftDiv.className = "row-left";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "group-checkbox";
+        checkbox.checked = isSelected;
+        checkbox.id = `group-cb-${index}`;
+        checkbox.setAttribute("aria-label", group.name);
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "group-info";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "group-name";
+        nameSpan.textContent = group.name;
+
+        const urlSpan = document.createElement("span");
+        urlSpan.className = "group-url-sub";
+        urlSpan.textContent = group.url;
+
+        infoDiv.appendChild(nameSpan);
+        infoDiv.appendChild(urlSpan);
+
+        leftDiv.appendChild(checkbox);
+        leftDiv.appendChild(infoDiv);
+
+        // Optional external link icon to open the FB group directly
+        const linkAnchor = document.createElement("a");
+        linkAnchor.href = group.url;
+        linkAnchor.target = "_blank";
+        linkAnchor.rel = "noopener noreferrer";
+        linkAnchor.className = "group-link-btn";
+        linkAnchor.title = "Open group in Facebook";
+        linkAnchor.setAttribute("aria-label", `Open ${group.name} in new tab`);
+        linkAnchor.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        `;
+
+        // Prevent clicking the external link icon from toggling the row's checkbox
+        linkAnchor.addEventListener("click", (e) => {
+          e.stopPropagation();
+        });
+
+        // Tapping anywhere on the row toggles the checkbox
+        li.addEventListener("click", (e) => {
+          if (e.target !== checkbox) {
+            checkbox.checked = !checkbox.checked;
+          }
+          toggleGroupSelection(group.url, checkbox.checked, li);
+        });
+
+        li.appendChild(leftDiv);
+        li.appendChild(linkAnchor);
+        groupListEl.appendChild(li);
+      });
+
+      if (visibleCount === 0) {
+        emptyStateEl.classList.add("visible");
+      } else {
+        emptyStateEl.classList.remove("visible");
+      }
+
+      updateSummaryAndPreview();
+    }
+
+    function toggleGroupSelection(url, isChecked, rowElement) {
+      if (isChecked) {
+        selectedUrls.add(url);
+        rowElement.classList.add("selected");
+        rowElement.setAttribute("aria-selected", "true");
+      } else {
+        selectedUrls.delete(url);
+        rowElement.classList.remove("selected");
+        rowElement.setAttribute("aria-selected", "false");
+      }
+      saveSelection();
+      updateSummaryAndPreview();
+    }
+
+    function updateSummaryAndPreview() {
+      const count = selectedUrls.size;
+      const total = GROUPS.length;
+
+      // Update live counter
+      counterBadgeEl.textContent = `${count} selected`;
+      if (count === 0) {
+        counterBadgeEl.classList.add("zero");
+      } else {
+        counterBadgeEl.classList.remove("zero");
+      }
+
+      // Enable/disable bulk buttons
+      selectAllBtnEl.disabled = count === total;
+      clearAllBtnEl.disabled = count === 0;
+
+      // Enable/disable big copy button
+      copyBtnEl.disabled = count === 0;
+
+      // Update live preview box
+      if (count === 0) {
+        previewBoxEl.textContent = "Select one or more groups above to preview the text that will be copied.";
+        previewBoxEl.classList.add("empty");
+        previewCountHintEl.textContent = "Nothing selected";
+      } else {
+        previewBoxEl.textContent = getFormattedOutput();
+        previewBoxEl.classList.remove("empty");
+        previewCountHintEl.textContent = count === 1 ? "1 group ready" : `${count} groups ready`;
+      }
+    }
+
+    /* ==========================================================================
+       BULK ACTIONS & SEARCH EVENTS
+       ========================================================================== */
+    selectAllBtnEl.addEventListener("click", () => {
+      GROUPS.forEach(group => selectedUrls.add(group.url));
+      saveSelection();
+      renderGroupList();
+    });
+
+    clearAllBtnEl.addEventListener("click", () => {
+      selectedUrls.clear();
+      saveSelection();
+      renderGroupList();
+    });
+
+    searchInputEl.addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      if (searchQuery.length > 0) {
+        clearSearchBtnEl.classList.add("visible");
+      } else {
+        clearSearchBtnEl.classList.remove("visible");
+      }
+      renderGroupList();
+    });
+
+    clearSearchBtnEl.addEventListener("click", () => {
+      searchInputEl.value = "";
+      searchQuery = "";
+      clearSearchBtnEl.classList.remove("visible");
+      searchInputEl.focus();
+      renderGroupList();
+    });
+
+    /* ==========================================================================
+       CLIPBOARD COPY WITH FALLBACK
+       Uses navigator.clipboard.writeText with textarea + execCommand('copy') fallback
+       ========================================================================== */
+    async function copyTextToClipboard(text) {
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch (err) {
+          // Fall through to textarea fallback if clipboard permission is denied
+        }
+      }
+
+      // Fallback method: off-screen textarea + document.execCommand('copy')
+      try {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.top = "-9999px";
+        textarea.style.left = "-9999px";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+
+        textarea.focus();
+        textarea.select();
+        textarea.setSelectionRange(0, textarea.value.length);
+
+        const successful = document.execCommand("copy");
+        document.body.removeChild(textarea);
+        return successful;
+      } catch (fallbackErr) {
+        return false;
+      }
+    }
+
+    copyBtnEl.addEventListener("click", async () => {
+      if (selectedUrls.size === 0) return;
+
+      const textToCopy = getFormattedOutput();
+      const copiedOk = await copyTextToClipboard(textToCopy);
+
+      if (copiedOk) {
+        showCopiedConfirmation();
+      }
+    });
+
+    function showCopiedConfirmation() {
+      copyBtnEl.classList.add("copied");
+      copyBtnTextEl.textContent = "Copied!";
+      copiedToastEl.classList.add("show");
+
+      if (copyResetTimeout) {
+        clearTimeout(copyResetTimeout);
+      }
+
+      copyResetTimeout = setTimeout(() => {
+        copyBtnEl.classList.remove("copied");
+        copyBtnTextEl.textContent = "Copy to clipboard";
+        copiedToastEl.classList.remove("show");
+      }, 2200);
+    }
+
+    /* ==========================================================================
+       INITIALIZATION
+       ========================================================================== */
+    function init() {
+      loadTheme();
+      loadSavedSelection();
+      renderGroupList();
+    }
+
+    init();
+  </script>
+</body>
+</html>
